@@ -15,7 +15,11 @@ class SocketService {
     });
 
     //When an event recieved from server, data is added to the stream
-    this.socket.on('event', (data) => streamSocket.addResponse);
+    socket.emit('/test', 'test');
+    this.socket.on('chat message', (data) {
+      print(data);
+      streamSocket.addResponse;
+    });
     this.socket.onDisconnect((_) => print('disconnect'));
     print(socket.connected);
   }
