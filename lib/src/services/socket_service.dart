@@ -1,8 +1,11 @@
+import 'package:flutter/material.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'dart:async';
 
 class SocketService {
-  final _socketResponse = StreamController<String>();
+  final _socketResponse = StreamController<List<dynamic>>();
+  final _scrollController = ScrollController();
+  List<dynamic> allMessage = [];
   IO.Socket socket;
 
   createSocketConnection() {
@@ -10,23 +13,38 @@ class SocketService {
         IO.OptionBuilder().setTransports(['websocket']).build());
     this.socket.connect();
     this.socket.onConnect((_) {
-      print('connect');
-      this.socket.emit('msg', 'test');
+      this.socket.emit('join', '18110239');
     });
 
     //When an event recieved from server, data is added to the stream
-    socket.emit('/test', 'test');
-    this.socket.on('chat message', (data) {
-      print(data);
-      streamSocket.addResponse;
+    this.socket.on('room', (data) {
+      allMessage.add(data);
+      _socketResponse.add(allMessage);
+      scrollToBottom();
     });
     this.socket.onDisconnect((_) => print('disconnect'));
     print(socket.connected);
   }
 
-  void Function(String) get addResponse => _socketResponse.sink.add;
+  sendMessage(msg) {
+    this.socket.emit('room', msg.toString());
+  }
 
-  Stream<String> get getResponse => _socketResponse.stream;
+  void Function(List<dynamic>) get addResponse => _socketResponse.sink.add;
+
+  Stream<List<dynamic>> get getResponse => _socketResponse.stream;
+
+  ScrollController get getScrollController => _scrollController;
+
+  void scrollToBottom() {
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent + 80.0,
+        curve: Curves.easeOut,
+        duration: Duration(milliseconds: 100),
+      );
+    }
+  }
 
   void dispose() {
     _socketResponse.close();
