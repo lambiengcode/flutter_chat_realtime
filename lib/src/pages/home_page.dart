@@ -27,6 +27,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _msgController.text = '';
+    //_focusNode.requestFocus();
   }
 
   @override
@@ -184,6 +185,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                       alignment: Alignment.center,
                       child: TextFormField(
+                        autofocus: true,
                         focusNode: _focusNode,
                         controller: _msgController,
                         onFieldSubmitted: (val) => submitMsg(val),
