@@ -1,16 +1,19 @@
-# flutter_chat_socket
+## Flutter Chat Socket
 
-A new Flutter project.
+### Description:
+- 🚀 This application using Flutter for develop a realtime chat app
 
-## Getting Started
+### How I can run it?
+- 🚀 Have a socket server
+- 🚀 Clone this repository
+- 🚀 Run below code in terminal of project
+```terminal
+flutter pub get
+flutter run
+```
 
-This project is a starting point for a Flutter application.
+### How I can extends project?
+- 🚀 Write extend channel in socket server
+- 🚀 Listen and emit new channel in ***socket_service.dart*** file in flutter project
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### Author: lambiengcode
