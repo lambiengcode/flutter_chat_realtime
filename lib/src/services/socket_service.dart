@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_chat_socket/src/repository/friend_repository.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'dart:async';
 
 class SocketService {
   final _socketResponse = StreamController<List<dynamic>>();
+  final _userInfo = StreamController<dynamic>();
   final _scrollController = ScrollController();
   List<dynamic> allMessage = [];
   IO.Socket socket;
@@ -13,6 +15,7 @@ class SocketService {
         IO.OptionBuilder().setTransports(['websocket']).build());
     this.socket.connect();
     this.socket.onConnect((_) {
+      print(socket.connected);
       this.socket.emit('join', '18110239');
     });
 
@@ -23,7 +26,7 @@ class SocketService {
       scrollToBottom();
     });
     this.socket.onDisconnect((_) => print('disconnect'));
-    print(socket.connected);
+    _userInfo.add(friends[0]);
   }
 
   sendMessage(msg) {
@@ -35,6 +38,10 @@ class SocketService {
   Stream<List<dynamic>> get getResponse => _socketResponse.stream;
 
   ScrollController get getScrollController => _scrollController;
+
+  void setUserInfo(dynamic info) => _userInfo.add(info);
+
+  Stream<dynamic> get getUserInfo => _userInfo.stream;
 
   void scrollToBottom() {
     if (_scrollController.hasClients) {
@@ -50,5 +57,3 @@ class SocketService {
     _socketResponse.close();
   }
 }
-
-SocketService streamSocket = SocketService();

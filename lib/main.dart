@@ -4,6 +4,7 @@ import 'package:flutter_chat_socket/src/common/app_initializer.dart';
 import 'package:flutter_chat_socket/src/common/dependecy_injection.dart';
 import 'package:flutter_chat_socket/src/services/socket_service.dart';
 import 'package:flutter_simple_dependency_injection/injector.dart';
+import 'package:get/get_navigation/get_navigation.dart';
 
 Injector injector = Injector();
 
@@ -14,7 +15,7 @@ void main() async {
   final SocketService socketService = injector.get<SocketService>();
   socketService.createSocketConnection();
   runApp(
-    MaterialApp(
+    GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Flutter Chat Realtime',
       home: App(),

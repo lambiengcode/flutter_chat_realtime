@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_socket/main.dart';
 import 'package:flutter_chat_socket/src/common/styles.dart';
+import 'package:flutter_chat_socket/src/pages/drawer/drawer.dart';
 import 'package:flutter_chat_socket/src/services/socket_service.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 
@@ -11,6 +12,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final SocketService socketService = injector.get<SocketService>();
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
   TextEditingController _msgController = new TextEditingController();
   FocusNode _focusNode = new FocusNode();
   String _msg = '';
@@ -18,9 +20,16 @@ class _HomePageState extends State<HomePage> {
   submitMsg(msg) {
     if (msg != '') {
       socketService.sendMessage(msg);
-      _msgController.text = '';
+      setState(() {
+        _msgController.text = '';
+        _msg = '';
+      });
     }
     _focusNode.requestFocus();
+  }
+
+  openDrawer() {
+    _scaffoldKey.currentState.openEndDrawer();
   }
 
   @override
@@ -33,6 +42,13 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
+      endDrawer: Container(
+        width: width * .25,
+        child: Drawer(
+          child: DrawerLayout(),
+        ),
+      ),
       appBar: AppBar(
         elevation: 1.0,
         backgroundColor: mC,
@@ -46,44 +62,52 @@ class _HomePageState extends State<HomePage> {
             size: 22.5,
           ),
         ),
-        title: Row(
-          children: [
-            Container(
-              height: 40.0,
-              width: 40.0,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                image: DecorationImage(
-                  image: NetworkImage(
-                      'https://avatars.githubusercontent.com/u/60530946?v=4'),
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-            SizedBox(width: 12.0),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+        title: StreamBuilder(
+          stream: socketService.getUserInfo,
+          builder: (context, AsyncSnapshot snapshot) {
+            if (!snapshot.hasData) {
+              return Container();
+            }
+
+            return Row(
               children: [
-                Text(
-                  'lambiengcode',
-                  style: TextStyle(
-                    color: colorTitle,
-                    fontSize: 16.5,
-                    fontWeight: FontWeight.w600,
+                Container(
+                  height: 40.0,
+                  width: 40.0,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    image: DecorationImage(
+                      image: NetworkImage(snapshot.data['image']),
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
-                SizedBox(height: 4.0),
-                Text(
-                  'Active Now',
-                  style: TextStyle(
-                    color: Colors.green.shade400,
-                    fontSize: 14.0,
-                    fontWeight: FontWeight.w400,
-                  ),
+                SizedBox(width: 12.0),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      snapshot.data['name'],
+                      style: TextStyle(
+                        color: colorTitle,
+                        fontSize: 16.5,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    SizedBox(height: 4.0),
+                    Text(
+                      'Active Now',
+                      style: TextStyle(
+                        color: Colors.green.shade400,
+                        fontSize: 14.0,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ],
                 ),
               ],
-            ),
-          ],
+            );
+          },
         ),
         actions: [
           IconButton(
@@ -105,7 +129,7 @@ class _HomePageState extends State<HomePage> {
           ),
           SizedBox(width: 8.0),
           IconButton(
-            onPressed: () => null,
+            onPressed: () => openDrawer(),
             icon: Icon(
               Feather.sidebar,
               size: 22.5,
@@ -223,7 +247,7 @@ class _HomePageState extends State<HomePage> {
                     onPressed: () => submitMsg(_msg),
                     icon: Icon(
                       Feather.send,
-                      color: colorPrimary,
+                      color: _msg.length == 0 ? fCD : colorPrimary,
                       size: 30.0,
                     ),
                   ),

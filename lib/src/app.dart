@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_chat_socket/src/pages/home_page.dart';
+import 'package:flutter_chat_socket/src/pages/home/home_page.dart';
 
 class App extends StatefulWidget {
   @override

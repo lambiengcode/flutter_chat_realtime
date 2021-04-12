@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 const myId = '18110239';
+var height = Get.height;
+var width = Get.width;
+
 var colorBlack1 = Color(0xFF191414);
 var colorBlack2 = Color(0xFF14171A);
 var colorDarkGrey = Color(0xFF657786);
