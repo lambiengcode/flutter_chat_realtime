@@ -47,7 +47,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       key: _scaffoldKey,
       endDrawer: Container(
-        width: width * .4,
+        width: 400.0,
         child: Drawer(
           child: DrawerLayout(),
         ),
@@ -154,7 +154,9 @@ class _HomePageState extends State<HomePage> {
                   }
 
                   return ListView.builder(
-                    padding: EdgeInsets.only(bottom: 12.0),
+                    //shrinkWrap: true,
+                    reverse: true,
+                    padding: EdgeInsets.only(bottom: 4.0),
                     controller: socketService.getScrollController,
                     itemCount: snapshot.data.length,
                     itemBuilder: (context, index) {
@@ -187,16 +189,16 @@ class _HomePageState extends State<HomePage> {
                     return Container();
                   }
 
-                  return Text(
-                    snapshot.data['isTyping']
-                        ? '${snapshot.data['name']} is typing...'
-                        : '',
-                    style: TextStyle(
-                      color: colorPrimary,
-                      fontSize: 15.0,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  );
+                  return snapshot.data['isTyping']
+                      ? Text(
+                          '${snapshot.data['name']} is typing...',
+                          style: TextStyle(
+                            color: colorPrimary,
+                            fontSize: 15.0,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        )
+                      : Container();
                 },
               ),
             ),

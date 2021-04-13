@@ -31,26 +31,31 @@ class SocketService {
   }
 
   subscribe() {
-    this.socket.on('$_room-history', (data) {
-      print(data);
+    this.socket.on('$myId-$_room-history', (data) {
       _allMessage.clear();
       _allMessage.addAll(data);
+      _allMessage = _allMessage.reversed.toList();
       _socketResponse.add(_allMessage);
+      scrollToBottom();
     });
 
     this.socket.on(_room, (data) {
-      _allMessage.add(data);
+      print(data);
+      _allMessage.insert(0, data);
       _socketResponse.add(_allMessage);
       scrollToBottom();
     });
 
     this.socket.on('$_room-typing', (data) {
       _typingController.add(data);
-      print(data);
     });
   }
 
   sendMessage(msg) {
+    _allMessage.insert(0, {
+      'msg': msg,
+      'id': myId,
+    });
     this.socket.emit(_room, msg.toString());
   }
 
@@ -86,7 +91,7 @@ class SocketService {
   void scrollToBottom() {
     if (_scrollController.hasClients) {
       _scrollController.animateTo(
-        _scrollController.position.maxScrollExtent + 80.0,
+        0.0,
         curve: Curves.easeOut,
         duration: Duration(milliseconds: 100),
       );
