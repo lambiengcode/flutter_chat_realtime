@@ -47,7 +47,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       key: _scaffoldKey,
       endDrawer: Container(
-        width: width * .25,
+        width: width * .4,
         child: Drawer(
           child: DrawerLayout(),
         ),

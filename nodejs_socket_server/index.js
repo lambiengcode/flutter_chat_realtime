@@ -83,27 +83,43 @@ app.get("/", (req, res) => {
 });
 
 io.on("connection", function (socket) {
-  console.log(socket.id, "joined");
   var id;
 
   socket.on("join", function (msg) {
     id = msg;
-    console.log(msg);
   });
 
-  socket.on("typing", function (typing) {
-    io.emit(typing.id, {
-      id: id,
-      name: typing.name,
-      isTyping: typing.isTyping,
+  socket.on("subscribe", function (roomInfo) {
+    console.log(roomInfo);
+    socket.join(roomInfo);
+
+    socket.to(roomInfo).on(roomInfo, function (msg) {
+      io.emit(roomInfo, {
+        msg: msg,
+        id: id,
+      });
+    });
+
+    socket.to(roomInfo).on(`${roomInfo}-typing`, function (typing) {
+      socket.to(roomInfo).emit(`${roomInfo}-typing`, {
+        id: id,
+        name: typing.name,
+        isTyping: typing.isTyping,
+      });
     });
   });
 
-  socket.on("room", function (msg) {
-    io.emit("room", {
-      msg: msg,
+  socket.on("unsubscribe", function (roomInfo) {
+    socket.to(roomInfo).emit(`${roomInfo}-typing`, {
+      id: id,
+      name: id,
+      isTyping: false,
+    });
+    socket.to(roomInfo).emit(roomInfo, {
+      msg: `${id} left.`,
       id: id,
     });
+    socket.leave(roomInfo);
   });
 });
 

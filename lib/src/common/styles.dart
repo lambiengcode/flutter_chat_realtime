@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-const myId = '18110239';
+var myId = GetPlatform.isWeb.toString();
 var height = Get.height;
 var width = Get.width;
 

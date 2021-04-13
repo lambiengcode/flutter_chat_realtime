@@ -7,43 +7,48 @@ import 'dart:async';
 class SocketService {
   final _socketResponse = StreamController<List<dynamic>>();
   final _typingController = StreamController<dynamic>();
-  final _userInfo = StreamController<dynamic>();
+  final _userController = StreamController<dynamic>();
   final _scrollController = ScrollController();
-  var userInfo;
-  List<dynamic> allMessage = [];
+  var _userInfo, _room = 'Selena';
+  List<dynamic> _allMessage = [];
   IO.Socket socket;
 
   createSocketConnection() {
+    _userController.add(friends[0]);
+    _userInfo = friends[0];
     this.socket = IO.io('http://localhost:3000/',
         IO.OptionBuilder().setTransports(['websocket']).build());
     this.socket.connect();
     this.socket.onConnect((_) {
-      print(socket.connected);
       this.socket.emit('join', myId);
+      // Join room
+      this.socket.emit('subscribe', _room);
     });
 
-    //When an event recieved from server, data is added to the stream
-    this.socket.on('room', (data) {
-      allMessage.add(data);
-      _socketResponse.add(allMessage);
+    subscribe();
+
+    this.socket.onDisconnect((_) => print('disconnect'));
+  }
+
+  subscribe() {
+    this.socket.on(_room, (data) {
+      _allMessage.add(data);
+      _socketResponse.add(_allMessage);
       scrollToBottom();
     });
 
-    this.socket.on(myId, (data) {
+    this.socket.on('$_room-typing', (data) {
       _typingController.add(data);
       print(data);
     });
-
-    this.socket.onDisconnect((_) => print('disconnect'));
-    _userInfo.add(friends[0]);
   }
 
   sendMessage(msg) {
-    this.socket.emit('room', msg.toString());
+    this.socket.emit(_room, msg.toString());
   }
 
   isTyping(isTyping) {
-    this.socket.emit('typing', {
+    this.socket.emit('$_room-typing', {
       'id': myId,
       'isTyping': isTyping,
       'name': 'lambiengcode',
@@ -58,9 +63,18 @@ class SocketService {
 
   ScrollController get getScrollController => _scrollController;
 
-  void setUserInfo(dynamic info) => _userInfo.add(info);
+  void setUserInfo(dynamic info) {
+    _userController.add(info);
+    _userInfo = info;
+    _allMessage.clear();
+    _socketResponse.add(_allMessage);
+    this.socket.emit('unsubscribe', _room);
+    _room = info['name'];
+    this.socket.emit('subscribe', _room);
+    subscribe();
+  }
 
-  Stream<dynamic> get getUserInfo => _userInfo.stream;
+  Stream<dynamic> get getUserInfo => _userController.stream;
 
   void scrollToBottom() {
     if (_scrollController.hasClients) {
@@ -75,6 +89,6 @@ class SocketService {
   void dispose() {
     _socketResponse.close();
     _typingController.close();
-    _userInfo.close();
+    _userController.close();
   }
 }
