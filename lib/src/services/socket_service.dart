@@ -23,14 +23,21 @@ class SocketService {
       this.socket.emit('join', myId);
       // Join room
       this.socket.emit('subscribe', _room);
-    });
 
-    subscribe();
+      subscribe();
+    });
 
     this.socket.onDisconnect((_) => print('disconnect'));
   }
 
   subscribe() {
+    this.socket.on('$_room-history', (data) {
+      print(data);
+      _allMessage.clear();
+      _allMessage.addAll(data);
+      _socketResponse.add(_allMessage);
+    });
+
     this.socket.on(_room, (data) {
       _allMessage.add(data);
       _socketResponse.add(_allMessage);
