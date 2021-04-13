@@ -26,5 +26,6 @@
 ### Author: lambiengcode
 
 ### Screenshots
-
+- 🚀 Below is video demo between linux desktop app and web platform
+ 
 <img src="https://github.com/hongvinhmobile/flutter_chat_realtime/blob/master/screenshots/socket.gif?raw=true" width="1280"/>
