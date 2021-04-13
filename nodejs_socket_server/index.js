@@ -3,8 +3,8 @@ const express = require("express");
 const app = express();
 const server = require("http").Server(app);
 const io = require("socket.io")(server);
-const connectDatabase = require('./common/connectDb');
-const {getAllMessages, addMessage} = require('./controllers/Message');
+const connectDatabase = require("./common/connectDb");
+const { getAllMessages, addMessage } = require("./controllers/Message");
 
 connectDatabase();
 
@@ -16,23 +16,20 @@ io.on("connection", function (socket) {
   });
 
   socket.on("subscribe", async function (roomInfo) {
-    console.log(roomInfo);
     socket.join(roomInfo);
+    const history = await getAllMessages(roomInfo);
+    io.emit(`${id}-${roomInfo}-history`, history);
 
-    socket.to(roomInfo).on(roomInfo, function (msg) {
-      io.emit(roomInfo, {
+    socket.on(roomInfo, async function (msg) {
+      socket.broadcast.to(roomInfo).emit(roomInfo, {
         msg: msg,
         id: id,
       });
-      addMessage({msg: msg, id: id}, roomInfo);
+      await addMessage({ msg: msg, id: id }, roomInfo);
     });
 
-    const history = await getAllMessages(roomInfo);
-    console.log(history);
-    socket.to(roomInfo).emit(`${roomInfo}-history`, history);
-
-    socket.to(roomInfo).on(`${roomInfo}-typing`, function (typing) {
-      socket.to(roomInfo).emit(`${roomInfo}-typing`, {
+    socket.on(`${roomInfo}-typing`, function (typing) {
+      socket.broadcast.to(roomInfo).emit(`${roomInfo}-typing`, {
         id: id,
         name: typing.name,
         isTyping: typing.isTyping,
@@ -41,16 +38,8 @@ io.on("connection", function (socket) {
   });
 
   socket.on("unsubscribe", function (roomInfo) {
-    socket.to(roomInfo).emit(`${roomInfo}-typing`, {
-      id: id,
-      name: id,
-      isTyping: false,
-    });
-    socket.to(roomInfo).emit(roomInfo, {
-      msg: `${id} left.`,
-      id: id,
-    });
     socket.leave(roomInfo);
+    socket.removeAllListeners(roomInfo);
   });
 });
 
