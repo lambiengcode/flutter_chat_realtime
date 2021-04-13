@@ -4,9 +4,6 @@ var app = express();
 var server = require("http").Server(app);
 var io = require("socket.io")(server);
 
-var count = 0;
-var messages = [];
-
 app.get("/", (req, res) => {
   res.write(`<html>
     <head>
@@ -86,29 +83,29 @@ app.get("/", (req, res) => {
 });
 
 io.on("connection", function (socket) {
-  io.of()
   console.log(socket.id, "joined");
   var id;
-  
+
   socket.on("join", function (msg) {
     id = msg;
     console.log(msg);
+  });
+
+  socket.on("typing", function (typing) {
+    io.emit(typing.id, {
+      id: id,
+      name: typing.name,
+      isTyping: typing.isTyping,
+    });
   });
 
   socket.on("room", function (msg) {
     io.emit("room", {
       msg: msg,
       id: id,
-    },);
+    });
   });
 });
-
-function appendMessage(username, msg) {
-  messages.push({
-    username: username,
-    msg: msg,
-  });
-}
 
 server.listen(process.env.PORT, "0.0.0.0", function () {
   console.log("Server is running on port: " + process.env.PORT);
