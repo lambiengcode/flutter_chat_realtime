@@ -16,13 +16,16 @@ class _HomePageState extends State<HomePage> {
   TextEditingController _msgController = new TextEditingController();
   FocusNode _focusNode = new FocusNode();
   String _msg = '';
+  bool _flagTyping = false;
 
   submitMsg(msg) {
     if (msg != '') {
       socketService.sendMessage(msg);
+      socketService.isTyping(false);
       setState(() {
         _msgController.text = '';
         _msg = '';
+        _flagTyping = false;
       });
     }
     _focusNode.requestFocus();
@@ -151,7 +154,7 @@ class _HomePageState extends State<HomePage> {
                   }
 
                   return ListView.builder(
-                    padding: EdgeInsets.only(bottom: 24.0),
+                    padding: EdgeInsets.only(bottom: 12.0),
                     controller: socketService.getScrollController,
                     itemCount: snapshot.data.length,
                     itemBuilder: (context, index) {
@@ -170,6 +173,29 @@ class _HomePageState extends State<HomePage> {
                         ),
                       );
                     },
+                  );
+                },
+              ),
+            ),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+              alignment: Alignment.centerLeft,
+              child: StreamBuilder(
+                stream: socketService.getTyping,
+                builder: (context, AsyncSnapshot snapshot) {
+                  if (!snapshot.hasData) {
+                    return Container();
+                  }
+
+                  return Text(
+                    snapshot.data['isTyping']
+                        ? '${snapshot.data['name']} is typing...'
+                        : '',
+                    style: TextStyle(
+                      color: colorPrimary,
+                      fontSize: 15.0,
+                      fontWeight: FontWeight.w400,
+                    ),
                   );
                 },
               ),
@@ -223,6 +249,17 @@ class _HomePageState extends State<HomePage> {
                         ),
                         onChanged: (val) {
                           setState(() {
+                            if (val.length == 0) {
+                              if (_flagTyping) {
+                                socketService.isTyping(false);
+                                _flagTyping = false;
+                              }
+                            } else {
+                              if (_flagTyping == false) {
+                                socketService.isTyping(true);
+                                _flagTyping = true;
+                              }
+                            }
                             _msg = val.trim();
                           });
                         },
