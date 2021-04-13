@@ -25,4 +25,6 @@
 
 ### Author: lambiengcode
 
-### Screenshots: [Update Later]()
+### Screenshots
+
+<img src="https://github.com/hongvinhmobile/flutter_chat_realtime/blob/master/screenshots/socket.gif?raw=true" width="1280"/>
