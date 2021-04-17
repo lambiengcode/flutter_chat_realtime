@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_chat_socket/main.dart';
 import 'package:flutter_chat_socket/src/common/styles.dart';
 import 'package:flutter_chat_socket/src/pages/drawer/drawer.dart';
@@ -19,15 +20,17 @@ class _HomePageState extends State<HomePage> {
   bool _flagTyping = false;
 
   submitMsg(msg) {
-    if (msg != '') {
+    if (msg == 'exit') {
+      SystemNavigator.pop();
+    } else if (msg != '') {
       socketService.sendMessage(msg);
       socketService.isTyping(false);
-      setState(() {
-        _msgController.text = '';
-        _msg = '';
-        _flagTyping = false;
-      });
     }
+    setState(() {
+      _msgController.text = '';
+      _msg = '';
+      _flagTyping = false;
+    });
     _focusNode.requestFocus();
   }
 
@@ -39,7 +42,6 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _msgController.text = '';
-    //_focusNode.requestFocus();
   }
 
   @override
