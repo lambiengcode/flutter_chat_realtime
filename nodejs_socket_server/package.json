@@ -5,13 +5,17 @@
   "main": "index.js",
   "start": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon index.js"
+    "build": "rimraf dist/ && babel ./ --out-dir dist/ --ignore ./node_modules,./.babelrc,./package.json,./npm-console.log.log --copy-files",
+    "start": "npm run build && node dist/index.js",
+    "dev": "nodemon --exec babel-node index.js",
+    "pm2": "yarn build && yarn pm2:start",
+    "pm2:start": "pm2 start ecosystem.config.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "babel-cli": "^6.26.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "http": "^0.0.1-security",
