@@ -4,6 +4,7 @@ module.exports = {
     script: 'dist/index.js',
     args: 'index.js',
     wait_ready: true,
+    watch: true,
     error_file: './logs/err.log',
     out_file: './logs/out.log',
     log_file: './logs/combined.log',

@@ -40,7 +40,6 @@ class SocketService {
     });
 
     this.socket.on(_room, (data) {
-      print(data);
       _allMessage.insert(0, data);
       _socketResponse.add(_allMessage);
       scrollToBottom();
